@@ -69,7 +69,8 @@ public class ValidadorService {
                 SignatureResponse firma = new SignatureResponse();
                 firma.setNombreCompleto(signatureData.getNombre() + " " + signatureData.getApellido());
                 firma.setCedula(signatureData.getIdentificacion());
-                firma.setEntidadCertificadora(cert.getIssuerX500Principal().getName());
+
+                firma.setEntidadCertificadora(extractOrganizationFromDN(cert.getIssuerX500Principal().getName()));
                 firma.setFechaFirma(signature.getSignDate().getTime());
                 firma.setEsValida(verificarFirma(signerInfo, cert, signedContent));
                 
@@ -177,6 +178,16 @@ public class ValidadorService {
         } catch (Exception e) {
             log.error("Error extrayendo campo DN {}: {}", field, e.getMessage());
             return null;
+        }
+    }
+
+    private String extractOrganizationFromDN(String dn) {
+        try {
+            String org = extractDNField(dn, "O=");
+            return org != null ? org : "Desconocido";
+        } catch (Exception e) {
+            log.error("Error extrayendo organización del DN: {}", e.getMessage());
+            return "Desconocido";
         }
     }
 
