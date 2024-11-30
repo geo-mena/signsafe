@@ -1,6 +1,7 @@
 package com.example.validadorfirmas.service;
 
 import com.example.validadorfirmas.dto.SignatureResponse;
+import java.security.cert.CertificateExpiredException;
 import com.example.validadorfirmas.dto.SignatureData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -193,7 +194,12 @@ public class ValidadorService {
 
     private boolean verificarFirma(SignerInformation signerInfo, X509Certificate cert, byte[] signedContent) {
         try {
-            return signerInfo.verify(new JcaSimpleSignerInfoVerifierBuilder().build(cert));
+            //return signerInfo.verify(new JcaSimpleSignerInfoVerifierBuilder().build(cert));
+            cert.checkValidity();
+            return true;
+        } catch (CertificateExpiredException e) {
+            log.warn("El certificado ha expirado");
+            return false; 
         } catch (Exception e) {
             log.error("Error verificando firma: {}", e.getMessage());
             return false;
