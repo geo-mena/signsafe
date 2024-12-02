@@ -1,95 +1,80 @@
-# signsafe - Validador de Firmas Digitales en Documentos PDF
+<div align="center">
+  <p>
+    <h2>
+      SignSafe - Digital Signature Validator
+    </h2>
+  </p>
 
-Este proyecto implementa un servicio REST en Spring Boot para validar firmas digitales en documentos PDF. Es capaz de procesar firmas de diferentes entidades certificadoras ecuatorianas como Security Data, UANATACA, entre otras.
+![Docker Badge](https://shields.io/badge/Docker-20.10.7-blue?logo=docker)
+![Java Badge](https://shields.io/badge/Java-11-red?logo=java)
+![Spring Boot Badge](https://shields.io/badge/Spring%20Boot-2.7.0-green?logo=spring)
+![PDFBox Badge](https://shields.io/badge/PDFBox-2.0.24-blue)
+![Maven Badge](https://shields.io/badge/Maven-3.8.4-blue)
 
-## Características
+</div>
 
-- Validación de firmas digitales en documentos PDF
-- Extracción de información del firmante:
-  - Nombre completo
-  - Número de cédula
-  - Entidad certificadora
-  - Fecha de firma
-  - Estado de validez del certificado
-- Soporte para múltiples firmas en un mismo documento
-- Soporte para diferentes entidades certificadoras ecuatorianas
+This project implements a REST service in Spring Boot to validate digital signatures in PDF documents. It is capable of processing signatures from different Ecuadorian certification entities such as Security Data, UANATACA, among others.
 
-## Tecnologías Utilizadas
+## 🎉 Features
 
-- Java 11
-- Spring Boot 2.7.0
-- PDFBox
-- Bouncy Castle
-- Docker
-- Maven
+- Validation of digital signatures in PDF documents
+- Extraction of signer information:
+  - Full name
+  - ID number
+  - Certification entity
+  - Date of signature
+  - Certificate validity status
+- Support for multiple signatures in a single document
+- Support for different Ecuadorian certification entities
 
-## Requisitos Previos
+## 🛠️ Stack
 
-- Java 11 o superior
-- Maven
-- Docker y Docker Compose (opcional)
+- **[Java](https://www.java.com/)** - Programming language
+- **[Spring Boot](https://spring.io/projects/spring-boot)** - Framework for creating web applications
+- **[PDFBox](https://pdfbox.apache.org/)** - Library for working with PDF documents
+- **[Bouncy Castle](https://www.bouncycastle.org/)** - Cryptography library
+- **[Maven](https://maven.apache.org/)** - Dependency management
+- **[Docker](https://www.docker.com/)** - Containerization platform
 
-## Estructura del Proyecto
+## 🚀 Installation
 
-```plaintext
-validador-firmas/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── example/
-│   │   │           └── validadorfirmas/
-│   │   │               ├── config/
-│   │   │               ├── controller/
-│   │   │               ├── dto/
-│   │   │               └── service/
-│   │   └── resources/
-│   └── test/
-├── docker-compose.yml
-├── Dockerfile
-├── pom.xml
-└── README.md
-```
-
-## Instalación
-
-1. Clonar el repositorio:
+1. Clone the repository:
 
 ```bash
 git clone https://github.com/geo-mena/signsafe.git
 cd signsafe
 ```
 
-2. Compilar el proyecto:
+2. Build the project:
 
 ```bash
 mvn clean package
 ```
 
-3. Ejecutar con Docker:
+3. Run the application using Docker:
 
 ```bash
 docker compose up -d
 ```
 
-O ejecutar localmente:
+Or run the application directly:
 
 ```bash
 java -jar target/validador-firmas-0.0.1-SNAPSHOT.jar
 ```
 
-## Uso
+## ⚡️ Usage
 
-El servicio REST expone un único endpoint para validar firmas digitales en documentos PDF:
+The REST service exposes a single endpoint to validate digital signatures in PDF documents:
 
 ```plaintext
 POST /api/validador/verificar
 Content-Type: multipart/form-data
 ```
 
-El archivo PDF debe ser enviado como un formulario multipart con el nombre `file`. El servicio responderá con un JSON que contiene la información de las firmas digitales encontradas en el documento.
+The PDF file must be sent as a multipart form with the name `file`. The service will respond with a JSON containing the information of the digital signatures found in the document.
 
-### Ejemplo de Solicitud
+## 📄 Example
 
 ```json
 {
@@ -107,35 +92,38 @@ El archivo PDF debe ser enviado como un formulario multipart con el nombre `file
 }
 ```
 
-## Características de la Validación
-El servicio realiza las siguientes validaciones:
+## 🔒️ Validation Features
 
-- Extracción de datos del certificado digital
-- Verificación de la vigencia del certificado
-- Soporte para diferentes formatos de firma digital
-- Manejo de múltiples firmas en un documento
+The service performs the following validations:
 
-## Limitaciones Conocidas
+- Extraction of digital certificate data
+- Verification of certificate validity
+- Support for different digital signature formats
+- Handling of multiple signatures in a document
 
-- No realiza verificación OCSP
-- No verifica listas de revocación (CRL)
-- La validación de la cadena de certificados no está implementada
+## 🚨 Known Limitations
 
-## Contribución
-Si deseas contribuir al proyecto:
+- Does not perform OCSP verification
+- Does not verify revocation lists (CRL)
+- Certificate chain validation is not implemented
 
-1. Realiza un fork del repositorio
-2. Crea una rama con tu funcionalidad: `git checkout -b feature/nueva-funcionalidad`
-3. Realiza un commit de tus cambios: `git commit -am 'Agrega nueva funcionalidad'`
-4. Realiza un push a la rama: `git push origin feature/nueva-funcionalidad`
-5. Crea un pull request
+## 🤝 Contributing
 
-## Licencia
+If you want to contribute to the project:
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+1. Fork the repository
+2. Create a branch with your feature: `git checkout -b feature/new-feature`
+3. Commit your changes: `git commit -am 'Add new feature`
+4. Push to the branch: `git push origin feature/new-feature`
+5. Submit a pull request
 
-La licencia MIT es una licencia de software permisiva que permite:
-- Uso comercial
-- Modificación
-- Distribución
-- Uso privado
+## 🔑 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+The MIT license is a permissive software license that allows:
+
+- Commercial use
+- Modification
+- Distribution
+- Private use
