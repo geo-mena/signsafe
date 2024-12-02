@@ -8,3 +8,4 @@ services:
       - ./logs:/app/logs
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+
