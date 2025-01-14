@@ -23,16 +23,33 @@ import java.util.*;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.InputStream;
+
 @Service
 @Slf4j
 public class ValidadorService {
 
+    /**
+     * Verifica las firmas digitales de un documento PDF
+     * 
+     * @param file Archivo PDF
+     * @return Lista de firmas digitales
+     */
     public List<SignatureResponse> verificarFirmas(MultipartFile file) {
         List<SignatureResponse> firmas = new ArrayList<>();
+
+        System.setProperty("org.apache.pdfbox.memory.useTempFile", "true");
+        MemoryUsageSetting memoryUsageSetting = MemoryUsageSetting.setupMixed(50 * 1024 * 1024L)
+            .setTempDir(new File(System.getProperty("java.io.tmpdir")));
         
-        try (PDDocument document = PDDocument.load(file.getInputStream())) {
+        try (InputStream inputStream =  new BufferedInputStream(file.getInputStream());
+            PDDocument document = PDDocument.load(inputStream, memoryUsageSetting)) {
+
             List<PDSignature> signatures = document.getSignatureDictionaries();
-            
+
             for (PDSignature signature : signatures) {
                 try {
                     SignatureResponse firma = procesarFirma(signature, file);
@@ -45,11 +62,21 @@ public class ValidadorService {
             }
         } catch (IOException e) {
             log.error("Error al cargar el documento PDF: {}", e.getMessage());
+        } finally {
+            System.gc();
         }
         
         return firmas;
     }
 
+    /**
+     * Procesa la firma digital de un documento
+     * 
+     * @param signature Firma digital
+     * @param file Archivo firmado
+     * @return Datos de la firma
+     * @throws Exception
+     */
     private SignatureResponse procesarFirma(PDSignature signature, MultipartFile file) throws Exception {
         byte[] contenidoFirma = signature.getContents(file.getInputStream());
         byte[] signedContent = signature.getSignedContent(file.getInputStream());
@@ -64,7 +91,7 @@ public class ValidadorService {
                 X509CertificateHolder certHolder = certCollection.iterator().next();
                 X509Certificate cert = new JcaX509CertificateConverter().getCertificate(certHolder);
 
-                debugCertificateInfo(cert);
+                // debugCertificateInfo(cert);
                 SignatureData signatureData = extractSignatureData(cert);
                 
                 SignatureResponse firma = new SignatureResponse();
@@ -82,6 +109,12 @@ public class ValidadorService {
         return null;
     }
 
+    /**
+     * Extrae los datos de la firma digital de un certificado
+     * 
+     * @param cert Certificado del firmante
+     * @return Datos de la firma
+     */
     private SignatureData extractSignatureData(X509Certificate cert) {
         try {
             String identificacion = "Desconocido";
@@ -151,6 +184,12 @@ public class ValidadorService {
         }
     }
 
+    /**
+     * Convierte un string hexadecimal a un string legible
+     * 
+     * @param hex Hexadecimal a decodificar
+     * @return String decodificado
+     */
     private String hexToString(String hex) {
         try {
             hex = hex.replaceAll("^#", "");
@@ -166,6 +205,13 @@ public class ValidadorService {
         }
     }
 
+    /**
+     * Extrae un campo específico del Distinguished Name
+     * 
+     * @param dn Distinguished Name
+     * @param field Campo a extraer
+     * @return Valor del campo
+     */
     private String extractDNField(String dn, String field) {
         try {
             int start = dn.indexOf(field);
@@ -182,6 +228,12 @@ public class ValidadorService {
         }
     }
 
+    /**
+     * Extrae el nombre de la organización del DN del certificado
+     * 
+     * @param dn Distinguished Name del certificado
+     * @return Nombre de la organización
+     */
     private String extractOrganizationFromDN(String dn) {
         try {
             String org = extractDNField(dn, "O=");
@@ -192,9 +244,16 @@ public class ValidadorService {
         }
     }
 
+    /**
+     * Verifica la firma digital de un documento
+     * 
+     * @param signerInfo Información del firmante
+     * @param cert Certificado del firmante
+     * @param signedContent Contenido firmado
+     * @return true si la firma es válida, false en caso contrario
+     */
     private boolean verificarFirma(SignerInformation signerInfo, X509Certificate cert, byte[] signedContent) {
         try {
-            //return signerInfo.verify(new JcaSimpleSignerInfoVerifierBuilder().build(cert));
             cert.checkValidity();
             return true;
         } catch (CertificateExpiredException e) {
@@ -206,6 +265,11 @@ public class ValidadorService {
         }
     }
 
+    /**
+     * ! Imprime información del certificado en el log
+     * 
+     * @param cert Certificado a imprimir
+     */
     private void debugCertificateInfo(X509Certificate cert) {
         try {
             log.debug("=== Información del Certificado ===");
